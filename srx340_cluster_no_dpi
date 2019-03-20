@@ -1,0 +1,160 @@
+## Last changed: 2019-02-12 01:11:24 UTC
+version 15.1X49-D45;
+groups {
+    node0 {
+        system {
+            host-name cluster-node0;
+        }
+        interfaces {
+            fxp0 {
+                unit 0 {
+                    family inet {
+                        address 10.0.0.9/29;
+                    }
+                }
+            }
+        }
+    }
+    node1 {
+        system {
+            host-name cluster-node1;
+        }
+        interfaces {
+            fxp0 {
+                unit 0 {
+                    family inet {
+                        address 10.0.0.10/29;
+                    }
+                }
+            }
+        }
+    }
+}
+system {
+    root-authentication {
+        encrypted-password "$5$XZmwE2pJ$n1g2IzU77.TpIrU2yk3gjp0N2uZGaVT1XA8RjOOujDA"; ## SECRET-DATA
+    }
+    services {
+        ssh;
+    }
+}
+chassis {
+    cluster {
+        reth-count 1;
+    }
+}
+security {
+    policies {
+        from-zone LAN to-zone WAN {
+            policy permit-all-traffic {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+        from-zone LAN to-zone LAN {
+            policy permit-all-traffic {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+        from-zone WAN to-zone WAN {
+            policy permit-all-traffic {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+        from-zone WAN to-zone LAN {
+            policy permit-all-traffic {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+    }
+    zones {
+        security-zone LAN {
+            description "workstation side of gateway";
+            host-inbound-traffic {
+                system-services {
+                    all;
+                    ping;
+                }
+            }
+            interfaces {
+                ge-0/0/2.0;
+            }
+        }
+        security-zone WAN {
+            description "web server side of gateway";
+            host-inbound-traffic {
+                system-services {
+                    all;
+                    ping;
+                }
+            }
+            interfaces {
+                ge-5/0/2.0;
+            }
+        }
+    }
+}
+interfaces {
+    ge-0/0/2 {
+        unit 0 {
+            family inet {
+                address 172.16.0.2/16;
+            }
+        }
+    }
+    ge-5/0/2 {
+        unit 0 {
+            family inet {
+                address 172.18.0.2/16;
+            }
+        }
+    }
+    fab0 {
+        fabric-options {
+            member-interfaces {
+                ge-0/0/0;
+            }
+        }
+    }
+    fab1 {
+        fabric-options {
+            member-interfaces {
+                ge-5/0/0;
+            }
+        }
+    }
+    fxp0 {
+        unit 0 {
+            family inet {
+                address 10.0.0.2/30;
+            }
+        }
+    }
+}

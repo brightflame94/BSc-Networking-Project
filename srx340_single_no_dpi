@@ -1,0 +1,112 @@
+## Last changed: 2019-02-07 00:07:16 UTC
+version 15.1X49-D45;
+system {
+    host-name gateway0;
+    root-authentication {
+        encrypted-password "$5$KWDK6kog$RdxN7ukzp4zeY3V7tnNAs9e9wez6S5Wx9K/MSHndoF."; ## SECRET-DATA
+    }
+    services {
+        ssh;
+    }
+}
+security {
+    policies {
+        from-zone LAN to-zone WAN {
+            policy permit-all-traffic {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+        from-zone LAN to-zone LAN {
+            policy permit-all-traffic {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+        from-zone WAN to-zone LAN {
+            policy permit-all-traffic {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+        from-zone WAN to-zone WAN {
+            policy permit-all-traffic {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+    }
+    zones {
+        security-zone LAN {
+            description "workstation side of gateway";
+            host-inbound-traffic {
+                system-services {
+                    all;
+                    ping;
+                }
+            }
+            interfaces {
+                ge-0/0/0.0;
+            }
+        }
+        security-zone WAN {
+            description "web server side of gateway";
+            host-inbound-traffic {
+                system-services {
+                    all;
+                    ping;
+                }
+            }
+            interfaces {
+                ge-0/0/1.0;
+            }
+        }
+    }
+}
+interfaces {
+    ge-0/0/0 {
+        unit 0 {
+            family inet {
+                address 192.168.0.2/24;
+            }
+        }
+    }
+    ge-0/0/1 {
+        unit 0 {
+            family inet {
+                address 172.16.0.2/16;
+            }
+        }
+    }
+    fxp0 {
+        unit 0 {
+            family inet {
+                address 10.0.0.2/30;
+            }
+        }
+    }
+}
