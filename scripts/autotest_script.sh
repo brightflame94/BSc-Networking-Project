@@ -65,7 +65,7 @@ sleep 7
 #
 #
 currentdate=$(date '+%d/%m/%Y %H:%M:%S');
-ab -n $reqno -c 1 -S -r -s 120 http://${dest_ip}:80/index_1.html > ${currentdir}/${filename}_ab_out
+ab -n $reqno -c 1 -S -r -s 120 -H 'Cookie: dpi_block=FALSE' http://${dest_ip}:80/index_1.html > ${currentdir}/${filename}_ab_out
 zenity --info --text "All http requests sent"
 # stop wireshark
 read -p "Once Wireshark has been closed press enter to continue."
@@ -121,7 +121,7 @@ sleep 7
 #
 #
 currentdate=$(date '+%d/%m/%Y %H:%M:%S');
-ab -n $reqno -c 1 -S -r -s 120 http://${dest_ip}:80/index_${i}.html > ${currentdir}/other_files/${filename}_ab_out
+ab -n $reqno -c 1 -S -r -s 120 -H 'Cookie: dpi_block=FALSE' http://${dest_ip}:80/index_${i}.html > ${currentdir}/other_files/${filename}_ab_out
 zenity --info --text "All http requests sent"
 # stop wireshark
 read -p "Once Wireshark has been closed press enter to continue."
