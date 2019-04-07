@@ -1,3 +1,4 @@
+set -e
 # Number of requests
 reqno=1000
 # Make test directories
@@ -65,7 +66,6 @@ sleep 7
 #
 #
 currentdate=$(date '+%d/%m/%Y %H:%M:%S');
-ab -n $reqno -c 1 -S -r -s 120 -H 'Cookie: dpi_block=FALSE' http://${dest_ip}:80/index_1.html > ${currentdir}/${filename}_ab_out
 zenity --info --text "All http requests sent"
 # stop wireshark
 read -p "Once Wireshark has been closed press enter to continue."
@@ -108,10 +108,10 @@ then
 mkdir -p ./results/${topology}/${security}/payload_tests_${testno}/other_files
 currentdir=./results/${topology}/${security}/payload_tests_${testno}
 
-for i in 1 2 3 4
+for i in 1 2 3 4 5 6 7 8 9 10
 do
 echo "Payload $i:"
-size=$(( 50 * $i ))
+size=$(( 2 + (0.5 * ($i - 1)) ))
 filename=${topology}_${security}_test${testno}_payload${i}
 #Start Wireshark
 #
@@ -121,7 +121,6 @@ sleep 7
 #
 #
 currentdate=$(date '+%d/%m/%Y %H:%M:%S');
-ab -n $reqno -c 1 -S -r -s 120 -H 'Cookie: dpi_block=FALSE' http://${dest_ip}:80/index_${i}.html > ${currentdir}/other_files/${filename}_ab_out
 zenity --info --text "All http requests sent"
 # stop wireshark
 read -p "Once Wireshark has been closed press enter to continue."
