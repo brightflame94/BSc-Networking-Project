@@ -1,4 +1,4 @@
-## Last changed: 2019-02-27 00:35:08 UTC
+## Last commit: 2019-04-03 02:13:09 UTC by root
 version 15.1X49-D45;
 groups {
     node0 {
@@ -9,7 +9,7 @@ groups {
             fxp0 {
                 unit 0 {
                     family inet {
-                        address 10.0.0.9/29;
+                        address 10.0.0.2/24;
                     }
                 }
             }
@@ -23,13 +23,14 @@ groups {
             fxp0 {
                 unit 0 {
                     family inet {
-                        address 10.0.0.10/29;
+                        address 10.0.0.3/24;
                     }
                 }
             }
         }
     }
 }
+apply-groups "${node}";
 system {
     root-authentication {
         encrypted-password "$5$XZmwE2pJ$n1g2IzU77.TpIrU2yk3gjp0N2uZGaVT1XA8RjOOujDA"; ## SECRET-DATA
@@ -40,7 +41,19 @@ system {
 }
 chassis {
     cluster {
-        reth-count 1;
+        reth-count 3;
+        redundancy-group 1 {
+            node 0 priority 100;
+            node 1 priority 1;
+            preempt;
+            gratuitous-arp-count 4;
+        }
+        redundancy-group 2 {
+            node 0 priority 1;
+            node 1 priority 100;
+            preempt;
+            gratuitous-arp-count 4;
+        }
     }
 }
 services {
@@ -91,8 +104,23 @@ security {
                             }
                         }
                     }
-                    log {
-                        session-close;
+                }
+            }
+        }
+        from-zone WAN to-zone LAN {
+            policy DPI {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit {
+                        application-services {
+                            application-firewall {
+                                rule-set dpi-rule-set;
+                            }
+                        }
                     }
                 }
             }
@@ -108,7 +136,7 @@ security {
                 }
             }
             interfaces {
-                ge-0/0/2.0;
+                reth1.0;
             }
         }
         security-zone WAN {
@@ -120,24 +148,30 @@ security {
                 }
             }
             interfaces {
-                ge-5/0/2.0;
+                reth2.0;
             }
         }
     }
 }
 interfaces {
     ge-0/0/2 {
-        unit 0 {
-            family inet {
-                address 172.16.0.2/16;
-            }
+        gigether-options {
+            redundant-parent reth1;
+        }
+    }
+    ge-0/0/3 {
+        gigether-options {
+            redundant-parent reth2;
         }
     }
     ge-5/0/2 {
-        unit 0 {
-            family inet {
-                address 172.18.0.2/16;
-            }
+        gigether-options {
+            redundant-parent reth1;
+        }
+    }
+    ge-5/0/3 {
+        gigether-options {
+            redundant-parent reth2;
         }
     }
     fab0 {
@@ -154,11 +188,31 @@ interfaces {
             }
         }
     }
-    fxp0 {
+    reth1 {
+        redundant-ether-options {
+            redundancy-group 1;
+        }
         unit 0 {
             family inet {
-                address 10.0.0.2/30;
+                mtu 1500;
+                address 172.16.0.2/16;
             }
         }
+    }
+    reth2 {
+        redundant-ether-options {
+            redundancy-group 2;
+        }
+        unit 0 {
+            family inet {
+                mtu 1500;
+                address 172.18.0.2/16;
+            }
+        }
+    }
+}
+snmp {
+    community public {
+        authorization read-only;
     }
 }
