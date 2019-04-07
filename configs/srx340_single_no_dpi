@@ -9,6 +9,12 @@ system {
         ssh;
     }
 }
+services {
+    application-identification {
+        no-application-identification;
+        no-application-system-cache;
+    }
+}
 security {
     policies {
         from-zone LAN to-zone WAN {
